@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨空间 | 个人主页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #5a5a5a;
+        }
+
+        /* 欢迎弹窗样式 */
+        #welcome-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(146, 161, 176, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .popup-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #a1c4fd, #c2e9fb);
+        }
+
+        .popup-content h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #6c8ac0;
+            font-weight: 600;
+        }
+
+        .popup-content p {
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #7a7a7a;
+        }
+
+        #enter-btn {
+            background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+            border: none;
+            padding: 14px 45px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            color: #5a7bb5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(161, 196, 253, 0.4);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        #enter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(161, 196, 253, 0.6);
+        }
+
+        /* 主页面样式 */
+        #main-page {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(146, 161, 176, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .main-content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #6c8ac0;
+            font-weight: 600;
+        }
+
+        .main-content p {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #7a7a7a;
+            margin-bottom: 30px;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(161, 196, 253, 0.4);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .social-icons a:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(161, 196, 253, 0.6);
+        }
+
+        /* 社交信息弹窗 */
+        .social-popup {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(146, 161, 176, 0.3);
+            z-index: 20;
+            white-space: nowrap;
+            font-size: 1rem;
+            color: #5a7bb5;
+            font-weight: 500;
+            border: 1px solid rgba(161, 196, 253, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .social-popup::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+
+        .social-icons a:hover .social-popup {
+            opacity: 1;
+            visibility: visible;
+            bottom: 60px;
+        }
+
+        /* 弹幕容器 */
+        #danmu-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .danmu {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 1.2rem;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 5px 15px rgba(146, 161, 176, 0.2);
+            backdrop-filter: blur(5px);
+            animation: danmuMove linear forwards;
+            z-index: 1;
+        }
+
+        @keyframes danmuMove {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-100%); }
+        }
+
+        /* 背景装饰元素 */
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(146, 161, 176, 0.2);
+            z-index: 0;
+        }
+
+        .element-1 {
+            width: 150px;
+            height: 150px;
+            top: 10%;
+            left: 10%;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .element-2 {
+            width: 100px;
+            height: 100px;
+            top: 70%;
+            right: 10%;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        .element-3 {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 20%;
+            animation: float 18s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 欢迎弹窗 -->
+    <div id="welcome-popup">
+        <div class="popup-content">
+            <h1>欢迎来到我的空间</h1>
+            <p>这里是一个充满温暖和正能量的地方，希望您能在这里找到片刻的宁静与快乐。</p>
+            <button id="enter-btn">进入空间</button>
+        </div>
+    </div>
+
+    <!-- 主页面 -->
+    <div id="main-page">
+        <!-- 背景装饰元素 -->
+        <div class="floating-element element-1"></div>
+        <div class="floating-element element-2"></div>
+        <div class="floating-element element-3"></div>
+        
+        <!-- 主要内容 -->
+        <div class="main-content">
+            <h1>温馨空间</h1>
+            <p>感谢您的到来，希望这些温馨的话语能给您带来一丝温暖和力量。</p>
+            
+            <div class="social-icons">
+                <a id="wechat-btn">
+                    <i class="fab fa-weixin"></i>
+                    <div class="social-popup">微信号: Sunshine2023</div>
+                </a>
+                <a id="qq-btn">
+                    <i class="fab fa-qq"></i>
+                    <div class="social-popup">QQ号: 123456789</div>
+                </a>
+                <a id="weibo-btn">
+                    <i class="fab fa-weibo"></i>
+                    <div class="social-popup">微博: @温暖的小站</div>
+                </a>
+                <a id="github-btn">
+                    <i class="fab fa-github"></i>
+                    <div class="social-popup">GitHub: WarmHeart2023</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 弹幕容器 -->
+        <div id="danmu-container"></div>
+    </div>
+
+    <script>
+        // 欢迎弹窗处理
+        document.getElementById('enter-btn').addEventListener('click', function() {
+            document.getElementById('welcome-popup').style.display = 'none';
+            document.getElementById('main-page').style.display = 'block';
+            
+            // 开始弹幕
+            startDanmu();
+        });
+
+        // 社交图标点击处理
+        document.getElementById('wechat-btn').addEventListener('click', function() {
+            alert('我的微信号是: Liuz5_24\n欢迎添加好友，一起交流分享！');
+        });
+        
+        document.getElementById('qq-btn').addEventListener('click', function() {
+            alert('我的QQ号是: 2659663834\n期待与您成为好友！');
+        });
+        
+        document.getElementById('weibo-btn').addEventListener('click', function() {
+            alert('我的微博是: @azhanOvO\n欢迎关注我的日常分享！');
+        });
+        
+        document.getElementById('github-btn').addEventListener('click', function() {
+            alert('我的GitHub账号是: liuz524\n欢迎查看我的开源项目！');
+        });
+
+        // 弹幕内容数组
+        const danmuTexts = [
+            "愿你被世界温柔以待 💖",
+            "今天也要开心哦 😊",
+            "你是最棒的 ✨",
+            "一切都会好起来的 🌈",
+            "保持微笑，生活很美 🌸",
+            "加油，你可以的 💪",
+            "每一天都是新的开始 🌅",
+            "你的努力终将绽放 🌟",
+            "相信美好的事情即将发生 🌠",
+            "愿你心中有光，脚下有路 🛤️",
+            "生活明朗，万物可爱 🌼",
+            "未来可期，不负韶华 ⏳",
+            "坚持就是胜利 🏆",
+            "你是独一无二的存在 🌈",
+            "世界因你而更美好 🌍",
+            "每一天都值得珍惜 ⭐",
+            "阳光总在风雨后 🌦️",
+            "梦想还是要有的，万一实现了呢 🌙",
+            "善良的人运气不会太差 🍀",
+            "感恩遇见，感谢陪伴 🤝",
+			"累了就歇会儿，你已经做得很好了 🛋️",
+			"今天的你，也在悄悄发光呀 ✨",
+			"愿温柔与好运，都与你撞个满怀 🌟",
+			"别着急，慢慢来，你想要的都会来 🐌",
+			"你的笑容，能治愈所有不开心 😄",
+			"即使平凡，你也在自己的世界里闪耀 ✨",
+			"难过时记得，有人在偷偷在意你 💌",
+			"每一份坚持，都在为未来铺路 🛣️",
+			"愿你每天都有小惊喜，小确幸 🎁",
+			"你值得所有美好的人和事 💕",
+			"偶尔的小沮丧，也是成长的小插曲 🎶",
+			"抬头看看天，烦恼会轻一点 ☁️",
+			"你付出的每一份善意，都有回响 🌸",
+			"今天也别忘了，给自己一个拥抱 🤗",
+			"慢慢来，生活不会辜负认真的你 ⏳",
+			"愿你眼里有光，心中有爱 ❤️",
+			"哪怕走得慢，向前走就好啦 🚶",
+			"你身上的温柔，足以对抗世间所有坚硬 💫",
+			"今天的风，也在为你加油呀 🍃",
+			"好好爱自己，才是终身浪漫的开始 💖"
+        ];
+
+        // 弹幕颜色数组 - 浅色系
+        const colors = [
+            "#a1c4fd", "#c2e9fb", "#d4fc79", "#96e6a1",
+            "#fbc2eb", "#a6c1ee", "#fccb90", "#e0c3fc",
+            "#89f7fe", "#66a6ff", "#b6c8d6", "#c1e1c1"
+        ];
+
+        // 开始弹幕
+        function startDanmu() {
+            // 先创建一些初始弹幕
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createDanmu, i * 300);
+            }
+            
+            // 然后定期创建新弹幕
+            setInterval(createDanmu, 800);
+        }
+
+        // 创建单个弹幕
+        function createDanmu() {
+            const container = document.getElementById('danmu-container');
+            const danmu = document.createElement('div');
+            danmu.className = 'danmu';
+            
+            // 随机选择弹幕内容和颜色
+            const randomText = danmuTexts[Math.floor(Math.random() * danmuTexts.length)];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            danmu.textContent = randomText;
+            danmu.style.color = randomColor;
+            danmu.style.border = `1px solid ${randomColor}40`; // 添加半透明边框
+            
+            // 随机设置弹幕位置和动画时长
+            const top = Math.random() * 85; // 0% 到 85% 的随机位置
+            const duration = 15 + Math.random() * 15; // 15-30秒的随机时长
+            
+            danmu.style.top = `${top}%`;
+            danmu.style.animationDuration = `${duration}s`;
+            
+            container.appendChild(danmu);
+            
+            // 动画结束后移除元素
+            setTimeout(() => {
+                if (danmu.parentNode === container) {
+                    container.removeChild(danmu);
+                }
+            }, duration * 1000);
+        }
+    </script>
+</body>
+</html>
